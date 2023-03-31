@@ -123,45 +123,45 @@ select * from dw.product_dim cd;
 
 
 --CALENDAR use function instead 
--- examplehttps://tapoueh.org/blog/2017/06/postgresql-and-the-calendar/
+-- example https://tapoueh.org/blog/2017/06/postgresql-and-the-calendar/
 
 --creating a table
-drop table if exists dw.calendar_dim ;
-CREATE TABLE dw.calendar_dim
-(
-dateid serial  NOT NULL,
-year        int NOT NULL,
-quarter     int NOT NULL,
-month       int NOT NULL,
-week        int NOT NULL,
-date        date NOT NULL,
-week_day    varchar(20) NOT NULL,
-leap  varchar(20) NOT NULL,
-CONSTRAINT PK_calendar_dim PRIMARY KEY ( dateid )
-);
-
---deleting rows
-truncate table dw.calendar_dim;
+--drop table if exists dw.calendar_dim ;
+--CREATE TABLE dw.calendar_dim
+--(
+--dateid serial  NOT NULL,
+--year        int NOT NULL,
+--quarter     int NOT NULL,
+--month       int NOT NULL,
+--week        int NOT NULL,
+--date        date NOT NULL,
+--week_day    varchar(20) NOT NULL,
+--leap  varchar(20) NOT NULL,
+--CONSTRAINT PK_calendar_dim PRIMARY KEY ( dateid )
+--);
 --
-insert into dw.calendar_dim 
-select 
-to_char(date,'yyyymmdd')::int as date_id,  
-       extract('year' from date)::int as year,
-       extract('quarter' from date)::int as quarter,
-       extract('month' from date)::int as month,
-       extract('week' from date)::int as week,
-       date::date,
-       to_char(date, 'dy') as week_day,
-       extract('day' from
-               (date + interval '2 month - 1 day')
-              ) = 29
-       as leap
-  from generate_series(date '2000-01-01',
-                       date '2030-01-01',
-                       interval '1 day')
-       as t(date);
---checking
-select * from dw.calendar_dim; 
+----deleting rows
+--truncate table dw.calendar_dim;
+----
+--insert into dw.calendar_dim 
+--select 
+--to_char(date,'yyyymmdd')::int as date_id,  
+--       extract('year' from date)::int as year,
+--       extract('quarter' from date)::int as quarter,
+--       extract('month' from date)::int as month,
+--       extract('week' from date)::int as week,
+--       date::date,
+--       to_char(date, 'dy') as week_day,
+--       extract('day' from
+--               (date + interval '2 month - 1 day')
+--              ) = 29
+--       as leap
+--  from generate_series(date '2000-01-01',
+--                       date '2030-01-01',
+--                       interval '1 day')
+--       as t(date);
+----checking
+--select * from dw.calendar_dim; 
 
 
 
@@ -175,8 +175,8 @@ CREATE TABLE dw.sales_fact
 (
  sales_id      serial NOT NULL,
  cust_id integer NOT NULL,
- order_date_id integer NOT NULL,
- ship_date_id integer NOT NULL,
+ order_date_id date NOT NULL,
+ ship_date_id date NOT NULL,
  prod_id  integer NOT NULL,
  ship_id     integer NOT NULL,
  geo_id      integer NOT NULL,
@@ -192,8 +192,8 @@ insert into dw.sales_fact
 select
 	 100+row_number() over() as sales_id
 	 ,cust_id
-	 ,to_char(order_date,'yyyymmdd')::int as  order_date_id
-	 ,to_char(ship_date,'yyyymmdd')::int as  ship_date_id
+	 ,order_date
+	 ,ship_date
 	 ,p.prod_id
 	 ,s.ship_id
 	 ,geo_id
